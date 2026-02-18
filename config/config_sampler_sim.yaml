@@ -1,0 +1,237 @@
+subinfo_fields:
+- name: subject_id
+  type: int
+  constraints:
+    min: 101
+    max: 999
+    digits: 3
+subinfo_mapping:
+  subject_id: 被试编号（3位）
+  Participant Information: 被试信息
+  registration_failed: 注册失败
+  registration_successful: 注册成功
+  invalid_input: '{field} 输入无效'
+window:
+  size:
+  - 1280
+  - 720
+  units: pix
+  screen: 0
+  bg_color: gray
+  fullscreen: false
+  monitor_width_cm: 35.5
+  monitor_distance_cm: 60
+task:
+  task_name: visual_search
+  save_path: ./outputs/sim_sampler
+  total_blocks: 1
+  total_trials: 9
+  trial_per_block: 9
+  conditions:
+  - feature
+  - conjunction
+  - absent
+  key_list:
+  - f
+  - j
+  - space
+  seed_mode: same_across_sub
+  delta: 1
+  language: Chinese
+  voice_name: zh-CN-YunyangNeural
+  voice_enabled: false
+timing:
+  cue_duration: 0.5
+  anticipation_duration: 1.0
+  prefeedback_duration: 0.4
+  feedback_duration: 0.8
+stimuli:
+  fixation:
+    type: text
+    text: +
+    color: white
+    height: 48
+    font: SimHei
+  instruction_text:
+    type: text
+    text: '视觉搜索任务
+
+
+      请判断目标是否出现在当前阵列中。
+
+      F=目标存在，J=目标不存在。
+
+
+      按空格键开始。'
+    color: white
+    height: 28
+    wrapWidth: 980
+    font: SimHei
+  feature_cue:
+    type: text
+    text: 线索：特征搜索
+    color: white
+    height: 44
+    wrapWidth: 900
+    font: SimHei
+  conjunction_cue:
+    type: text
+    text: 线索：结合搜索
+    color: white
+    height: 44
+    wrapWidth: 900
+    font: SimHei
+  absent_cue:
+    type: text
+    text: 线索：目标缺失
+    color: yellow
+    height: 44
+    wrapWidth: 900
+    font: SimHei
+  feature_target:
+    type: text
+    text: '目标是否出现？
+
+      F=出现   J=未出现'
+    color: white
+    height: 54
+    wrapWidth: 900
+    font: SimHei
+  conjunction_target:
+    type: text
+    text: '目标是否出现？
+
+      F=出现   J=未出现'
+    color: white
+    height: 54
+    wrapWidth: 900
+    font: SimHei
+  absent_target:
+    type: text
+    text: '目标是否出现？
+
+      F=出现   J=未出现'
+    color: white
+    height: 54
+    wrapWidth: 900
+    font: SimHei
+  feature_hit_feedback:
+    type: text
+    text: 反应已记录
+    color: green
+    height: 42
+    font: SimHei
+  feature_miss_feedback:
+    type: text
+    text: 未在时限内作答
+    color: red
+    height: 42
+    font: SimHei
+  conjunction_hit_feedback:
+    type: text
+    text: 反应已记录
+    color: green
+    height: 42
+    font: SimHei
+  conjunction_miss_feedback:
+    type: text
+    text: 未在时限内作答
+    color: red
+    height: 42
+    font: SimHei
+  absent_hit_feedback:
+    type: text
+    text: 反应已记录
+    color: green
+    height: 42
+    font: SimHei
+  absent_miss_feedback:
+    type: text
+    text: 未在时限内作答
+    color: red
+    height: 42
+    font: SimHei
+  block_break:
+    type: text
+    text: '区块 {block_num}/{total_blocks}
+
+      记录率：{accuracy:.2%}
+
+      当前分数：{total_score}
+
+
+      按空格键继续'
+    color: white
+    height: 24
+    wrapWidth: 900
+    font: SimHei
+  good_bye:
+    type: text
+    text: '任务结束，最终分数：{total_score}
+
+
+      按空格键退出'
+    color: white
+    height: 28
+    wrapWidth: 900
+    font: SimHei
+triggers:
+  map:
+    exp_onset: 1
+    exp_end: 2
+    block_onset: 10
+    block_end: 11
+    feature_cue_onset: 20
+    conjunction_cue_onset: 21
+    absent_cue_onset: 22
+    feature_anti_onset: 30
+    conjunction_anti_onset: 31
+    absent_anti_onset: 32
+    feature_target_onset: 40
+    conjunction_target_onset: 41
+    absent_target_onset: 42
+    feature_key_press: 50
+    conjunction_key_press: 51
+    absent_key_press: 52
+    feature_no_response: 60
+    conjunction_no_response: 61
+    absent_no_response: 62
+    feature_hit_fb_onset: 70
+    feature_miss_fb_onset: 71
+    conjunction_hit_fb_onset: 72
+    conjunction_miss_fb_onset: 73
+    absent_hit_fb_onset: 74
+    absent_miss_fb_onset: 75
+  driver:
+    type: serial_url
+    url: loop://
+    baudrate: 115200
+  timing:
+    post_delay_ms: 1
+  policy:
+    strict: false
+controller:
+  initial_duration: 0.25
+  min_duration: 0.08
+  max_duration: 0.4
+  step: 0.02
+  target_accuracy: 0.66
+  condition_specific: true
+  enable_logging: true
+sim:
+  output_dir: outputs/sim_sampler
+  seed: 0
+  participant_id: sim001
+  session_id: sub-sim001_task-visual_search_sampler_seed0
+  log_path: outputs/sim_sampler/sub-sim001_task-visual_search_sampler_seed0_sim_events.jsonl
+  policy: warn
+  default_rt_s: 0.2
+  clamp_rt: false
+  responder:
+    type: responders.task_sampler:TaskSamplerResponder
+    kwargs:
+      key: f
+      hit_rate: 0.7
+      rt_mean_s: 0.28
+      rt_sd_s: 0.05
+      rt_min_s: 0.12
