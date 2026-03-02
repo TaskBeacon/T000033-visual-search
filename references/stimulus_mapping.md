@@ -1,16 +1,13 @@
 ﻿# Stimulus Mapping
 
-Task: `Visual Search Task`
+## Mapping Table
 
-| Condition | Implemented Stimulus IDs | Source Paper ID | Evidence (quote/figure/table) | Implementation Mode | Notes |
-|---|---|---|---|---|---|
-| `feature_present` | `array_boundary`, `fixation`, `search_goal`, dynamic item set (`red T` target + `green T` distractors) | `TreismanGelade1980` | Feature search: target differs by a single feature dimension from distractors. | `psychopy_builtin` | Implemented with PsychoPy text stimuli sampled on a circular layout. |
-| `feature_absent` | `array_boundary`, `fixation`, `search_goal`, dynamic item set (`green T` distractors only) | `TreismanGelade1980` | Target-absent trials in feature search contain only non-target feature items. | `psychopy_builtin` | No target instance is inserted. |
-| `conjunction_present` | `array_boundary`, `fixation`, `search_goal`, dynamic item set (`red T` target among `red L` and `green T`) | `Wolfe1994` | Conjunction search requires combining feature channels to identify the target. | `psychopy_builtin` | Distractors carry one but not both target-defining features. |
-| `conjunction_absent` | `array_boundary`, `fixation`, `search_goal`, dynamic item set (`red L` and `green T` only) | `Wolfe1994` | Target-absent conjunction displays remove the target conjunction while preserving distractor mixture. | `psychopy_builtin` | Balanced with present trials at block generation level. |
-| `all_conditions` | `instruction_text`, `block_break`, `good_bye` | `DuncanHumphreys1989` | Shared instructions and summaries support consistent response policy and quality control. | `psychopy_builtin` | Participant-facing text avoids exposing internal condition IDs. |
-
-Implementation mode legend:
-- `psychopy_builtin`: stimulus rendered via PsychoPy primitives in config/code.
-- `generated_reference_asset`: task-specific synthetic assets generated from reference-described stimulus rules.
-- `licensed_external_asset`: externally sourced licensed media with protocol linkage.
+| Condition | Stage/Phase | Stimulus IDs | Participant-Facing Content | Source Paper ID | Evidence (quote/figure/table) | Implementation Mode | Asset References | Notes |
+|---|---|---|---|---|---|---|---|---|
+| `feature_present` | search_array | `array_boundary`, `fixation`, `search_goal`, `search_items` | Circular letter array containing one red `T` target among green `T` distractors. | TreismanGelade1980 | Feature search present trials define target by a single distinguishing feature. | psychopy_builtin | `config/*.yaml -> stimuli.array_boundary/fixation/search_goal`, `src/utils.py`, `src/run_trial.py` | Search items are generated each trial from controller parameters. |
+| `feature_absent` | search_array | `array_boundary`, `fixation`, `search_goal`, `search_items` | Circular letter array containing only green `T` items (no red `T` target). | TreismanGelade1980 | Feature search absent trials contain distractor-only displays. | psychopy_builtin | `config/*.yaml -> stimuli.array_boundary/fixation/search_goal`, `src/utils.py`, `src/run_trial.py` | Correct response maps to `absent_key`. |
+| `conjunction_present` | search_array | `array_boundary`, `fixation`, `search_goal`, `search_items` | Circular array with one red `T` target among mixed red `L` and green `T` distractors. | Wolfe1994 | Conjunction search requires combining feature channels to identify target. | psychopy_builtin | `config/*.yaml -> stimuli.array_boundary/fixation/search_goal`, `src/utils.py`, `src/run_trial.py` | Distractors share one feature with the target. |
+| `conjunction_absent` | search_array | `array_boundary`, `fixation`, `search_goal`, `search_items` | Circular array with mixed red `L` and green `T` distractors and no red `T` target. | Wolfe1994 | Absent conjunction trials preserve distractor mixture while removing target conjunction. | psychopy_builtin | `config/*.yaml -> stimuli.array_boundary/fixation/search_goal`, `src/utils.py`, `src/run_trial.py` | Maintains conjunction difficulty without target presence. |
+| `all_conditions` | fixation | `fixation`, `search_goal` | Central fixation cross with top-line search goal reminder before each array. | Wolfe1994 | A short pre-array epoch separates preparation from search display onset. | psychopy_builtin | `config/*.yaml -> stimuli.fixation/search_goal` | Goal text remains config-defined for localization. |
+| `all_conditions` | iti | `fixation` | Brief inter-trial fixation before the next trial. | DuncanHumphreys1989 | ITI baseline helps separate trial-level responses. | psychopy_builtin | `config/*.yaml -> stimuli.fixation` | ITI onset is trigger-coded (`iti_onset`). |
+| `all_conditions` | envelope | `instruction_text`, `block_break`, `good_bye` | Instructions plus block/session summary screens with accuracy, RT, and timeout metrics. | DuncanHumphreys1989 | Stable response policy and quality monitoring require clear instruction and summary screens. | psychopy_builtin | `config/*.yaml -> stimuli.instruction_text/block_break/good_bye` | No participant-facing trial wording is hardcoded in `run_trial.py`. |

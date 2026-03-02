@@ -1,5 +1,13 @@
 ﻿# CHANGELOG
 
+## [v0.1.3-dev] - 2026-03-02
+
+### Changed
+- Repaired `src/run_trial.py` to a visual-search-native trial flow (`fixation -> search_array -> iti`) and removed residual MID-style stages.
+- Implemented controller-driven search-array rendering in runtime (feature/conjunction, present/absent, set size, item orientation/position) using PsychoPy text stimuli.
+- Aligned trial context and outputs to QA/sampler contracts (`phase=search_array`, key mapping factors, `search_array_response`, `search_array_rt`, `search_array_hit`, `timed_out`).
+- Rebuilt all reference artifacts to the current schema contract (`references.yaml`, `references.md`, `parameter_mapping.md`, `stimulus_mapping.md`, `task_logic_audit.md` with sections `## 1` to `## 8`).
+
 ## [v0.1.1-dev] - 2026-02-19
 
 ### Changed

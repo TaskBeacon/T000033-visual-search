@@ -1,65 +1,41 @@
 ﻿task_id: T000033
-generated_at: '2026-02-19T11:20:00Z'
-selection_policy: manual_curated_visual_search_core
+generated_at: '2026-03-02T14:35:00Z'
+selection_policy: manual_curation_literature_first
 citation_threshold: 100
 papers:
   - id: TreismanGelade1980
-    title: A feature-integration theory of attention
-    authors:
-      - Anne Treisman
-      - Garry Gelade
+    title: "A feature-integration theory of attention"
     year: 1980
-    journal: Cognitive Psychology
-    doi_or_url: https://doi.org/10.1016/0010-0285(80)90005-5
+    journal: "Cognitive Psychology"
+    doi_or_url: "https://doi.org/10.1016/0010-0285(80)90005-5"
     citation_count: 10000
-    is_high_impact: true
     open_access: false
+    is_high_impact: true
     used_for:
-      - task_workflow
-      - condition_design
-      - stimulus_logic
-    parameter_bindings:
-      - task.conditions
-      - controller.feature_set_sizes
-      - controller.target_color
-      - controller.distractor_color
-    notes: Foundational feature vs conjunction search formulation.
+      - condition_logic
+      - feature_vs_conjunction_definition
+      - target_presence_semantics
   - id: Wolfe1994
-    title: Guided Search 2.0 A revised model of visual search
-    authors:
-      - Jeremy M. Wolfe
+    title: "Guided Search 2.0: A revised model of visual search"
     year: 1994
-    journal: Psychonomic Bulletin & Review
-    doi_or_url: https://doi.org/10.3758/BF03200774
+    journal: "Psychonomic Bulletin & Review"
+    doi_or_url: "https://doi.org/10.3758/BF03200774"
     citation_count: 3500
-    is_high_impact: false
     open_access: true
+    is_high_impact: false
     used_for:
-      - task_workflow
-      - conjunction_search_rationale
-      - timing_parameters
-    parameter_bindings:
-      - timing.response_deadline
-      - controller.conjunction_set_sizes
-    notes: Core model support for conjunction-driven search cost.
+      - set_size_manipulation
+      - response_time_emphasis
+      - trial_timing_rationale
   - id: DuncanHumphreys1989
-    title: Visual search and stimulus similarity
-    authors:
-      - John Duncan
-      - Glyn W. Humphreys
+    title: "Visual search and stimulus similarity"
     year: 1989
-    journal: Psychological Review
-    doi_or_url: https://doi.org/10.1037/0033-295X.96.3.433
+    journal: "Psychological Review"
+    doi_or_url: "https://doi.org/10.1037/0033-295X.96.3.433"
     citation_count: 2500
-    is_high_impact: true
     open_access: false
+    is_high_impact: true
     used_for:
-      - dependent_measures
+      - distractor_similarity_logic
+      - layout_constraints
       - response_policy
-      - layout_rationale
-    parameter_bindings:
-      - task.key_list
-      - timing.iti_duration
-      - triggers.map.response_present
-      - triggers.map.response_absent
-    notes: Supports similarity-based search behavior and response interpretation.

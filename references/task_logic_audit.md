@@ -1,93 +1,103 @@
-﻿# Task Logic Audit: Visual Search Task (Feature vs Conjunction)
+﻿# Task Logic Audit: Visual Search Task
 
 ## 1. Paradigm Intent
 
-- Task: `visual_search`
-- Primary construct: search efficiency differences between single-feature search and conjunction search.
+- Task: `visual_search`.
+- Construct: selective-attention efficiency in feature search versus conjunction search.
 - Manipulated factors:
   - search type (`feature`, `conjunction`)
   - target presence (`present`, `absent`)
-  - set size (sampled from configured lists)
-- Dependent measures: response key, RT, correctness, timeout rate, and condition-wise accuracy/RT summaries.
+  - set size sampled from configured pools.
+- Primary dependent measures:
+  - response key (`present` / `absent`)
+  - response time (`search_array_rt`)
+  - accuracy (`search_array_hit`)
+  - timeout rate.
 - Key citations:
-  - Treisman, A., & Gelade, G. (1980). *A feature-integration theory of attention.*
-  - Wolfe, J. M. (1994). *Guided Search 2.0.*
-  - Duncan, J., & Humphreys, G. W. (1989). *Visual search and stimulus similarity.*
+  - `TreismanGelade1980`
+  - `Wolfe1994`
+  - `DuncanHumphreys1989`
 
 ## 2. Block/Trial Workflow
 
 ### Block Structure
 
-- Total blocks: 3 (human), 1 (QA/sim profiles).
-- Trials per block: fixed by config (`trial_per_block`).
-- Randomization/counterbalancing: conditions are sampled by `BlockUnit.generate_conditions()` with balanced counts; each trial independently samples set size and item positions.
+- Human profile: `3` blocks x `48` trials.
+- QA/sim profiles: `1` block x `16` trials.
+- `BlockUnit.generate_conditions()` samples configured condition tokens per block.
+- Controller resets block counters via `controller.start_block(block_idx)`.
 
 ### Trial State Machine
 
 1. `fixation`
-   - Onset trigger: `fixation_onset`
-   - Stimuli shown: central fixation cross plus top reminder text (`Target: red T`)
-   - Valid keys: `[]`
-   - Timeout behavior: auto-advance after sampled fixation duration
-   - Next state: `search_array`
+- Stimuli: `fixation`, `search_goal`.
+- Trigger: `fixation_onset`.
+- Keys: none.
+- Next: `search_array`.
 
 2. `search_array`
-   - Onset trigger: `search_onset`
-   - Stimuli shown: circular search layout with item set (letters with color/orientation), fixation, and goal label
-   - Valid keys: `[present_key, absent_key]` (default `f`, `j`)
-   - Timeout behavior: if no response before `response_deadline`, emit `search_timeout` and mark timeout
-   - Next state: `iti`
+- Stimuli: `array_boundary`, `fixation`, `search_goal`, plus dynamic item list from controller (`search_items`).
+- Trigger: `search_onset`.
+- Valid keys: `present_key`, `absent_key`.
+- Response triggers: `response_present`, `response_absent`.
+- Timeout trigger: `search_timeout`.
+- Next: `iti`.
 
 3. `iti`
-   - Onset trigger: `iti_onset`
-   - Stimuli shown: fixation
-   - Valid keys: `[]`
-   - Timeout behavior: auto-advance after ITI duration
-   - Next state: next trial or block end
+- Stimulus: `fixation`.
+- Trigger: `iti_onset`.
+- Keys: none.
+- Next: next trial or block end.
 
 ## 3. Condition Semantics
 
-- Condition ID: `feature_present`
-  - Participant-facing meaning: target exists in a feature-search display.
-  - Concrete stimulus realization: one red `T` target among green `T` distractors.
-  - Outcome rules: correct response is `present_key`.
+- `feature_present`:
+  - target exists in a feature-search display.
+  - realization: one red `T` among green `T` distractors.
+  - correct response: `present_key`.
 
-- Condition ID: `feature_absent`
-  - Participant-facing meaning: no target in a feature-search display.
-  - Concrete stimulus realization: all items are green `T` distractors (no red `T`).
-  - Outcome rules: correct response is `absent_key`.
+- `feature_absent`:
+  - no target in a feature-search display.
+  - realization: green `T` distractors only.
+  - correct response: `absent_key`.
 
-- Condition ID: `conjunction_present`
-  - Participant-facing meaning: target exists in a conjunction-search display.
-  - Concrete stimulus realization: one red `T` target among mixed red `L` and green `T` distractors.
-  - Outcome rules: correct response is `present_key`.
+- `conjunction_present`:
+  - target exists in a conjunction-search display.
+  - realization: one red `T` among red `L` and green `T` distractors.
+  - correct response: `present_key`.
 
-- Condition ID: `conjunction_absent`
-  - Participant-facing meaning: no target in a conjunction-search display.
-  - Concrete stimulus realization: mixed red `L` and green `T` distractors, with no red `T` target.
-  - Outcome rules: correct response is `absent_key`.
+- `conjunction_absent`:
+  - no target in a conjunction-search display.
+  - realization: red `L` and green `T` distractors without red `T`.
+  - correct response: `absent_key`.
 
 ## 4. Response and Scoring Rules
 
-- Response mapping: `F = target present`, `J = target absent`.
-- Missing-response policy: timeout after `response_deadline`; timeout count is tracked per block/session.
-- Correctness logic: `hit=True` only when response matches target presence (present key on target-present trial, absent key on target-absent trial).
-- Reward/penalty updates: none (no point-based scoring); performance summarized by accuracy and RT.
-- Running metrics: per block and overall, report accuracy, mean correct RT (ms), and timeout counts.
+- Key mapping (default):
+  - `f` -> target present
+  - `j` -> target absent.
+- Timeout policy:
+  - if no valid key before `response_deadline`, mark `timed_out=true` and emit `search_timeout`.
+- Accuracy policy:
+  - `search_array_hit=true` only when key matches target presence.
+- Aggregation policy:
+  - block and overall summaries report accuracy, mean correct RT (ms), and timeout counts.
+- QA-required fields are produced in trial rows:
+  - `condition`, `block_id`, `trial_index`, `search_type`, `target_present`, `set_size`, `search_array_response`, `search_array_rt`, `search_array_hit`.
 
 ## 5. Stimulus Layout Plan
 
-- Screen: `search_array`
-  - Stimulus IDs shown together: `array_boundary`, `fixation`, `search_goal`, dynamic item letters.
-  - Layout anchors (`pos`):
-    - fixation at center `(0, 0)`
-    - goal text near top `(0, 305)`
-    - items placed around a circular ring (`array_radius_px` with jitter)
-  - Size/spacing:
-    - item letter height (`item_height`, default 42-44 px)
-    - ring radius around 240-245 px with limited jitter
-  - Readability checks: bounded set sizes (8-16) and angular spacing prevent overlap and preserve visual crowding manipulation.
-  - Rationale: circular distribution provides standard visual-search geometry with controlled eccentricity.
+- Display envelope: `1280 x 720`, unit `pix`.
+- `search_goal`: top-center (`0, 305`) to keep objective visible.
+- `fixation`: center (`0, 0`).
+- `array_boundary`: centered circle radius around `285` px.
+- Search items:
+  - sampled positions around circular ring (`array_radius_px` with jitter)
+  - item height configured by `timing.item_height`
+  - item font configured by `timing.item_font`
+  - orientation sampled from `controller.orientation_pool`.
+- Readability rationale:
+  - set sizes are capped and positions are jittered from angular scaffolding to avoid dense overlap.
 
 ## 6. Trigger Plan
 
@@ -98,22 +108,23 @@
 | `block_onset` | 10 | block start |
 | `block_end` | 11 | block end |
 | `fixation_onset` | 20 | fixation phase onset |
-| `search_onset` | 30 | search array onset |
+| `search_onset` | 30 | search-array onset |
 | `response_present` | 31 | present-key response |
 | `response_absent` | 32 | absent-key response |
 | `search_timeout` | 33 | no response before deadline |
-| `iti_onset` | 40 | ITI onset |
+| `iti_onset` | 40 | inter-trial interval onset |
 
-## 7. Inference Log
+## 7. Architecture Decisions (Auditability)
 
-- Decision: use letter stimuli (`T`, `L`) with color conjunction manipulation instead of image assets.
-- Why inference was required: cited theories define search constraints (feature vs conjunction) but not a single mandatory graphic asset set.
-- Citation-supported rationale: feature-integration and guided-search frameworks are operationalized with color/shape conjunction displays.
+- `main.py` remains one mode-aware runtime (`human|qa|sim`) with shared trial loop and summary calculation.
+- `src/run_trial.py` uses visual-search-native phases only (`fixation -> search_array -> iti`); MID template phases are removed.
+- `set_trial_context(...)` on `search_array` includes sampler-critical factors: `target_present`, `present_key`, `absent_key`, `set_size`.
+- Participant-facing wording is config-driven (`stimuli.*`) to support localization without code edits.
+- Controller owns search-array generation; runtime orchestrates phase execution and logging.
 
-- Decision: include four explicit conditions (`feature/conjunction` x `present/absent`) as config tokens.
-- Why inference was required: literature describes factors, while implementation needs explicit trial labels.
-- Citation-supported rationale: explicit factorized condition tokens preserve direct mapping from theory to runtime state.
+## 8. Inference Log
 
-- Decision: no per-trial reward scoring or evaluative feedback text.
-- Why inference was required: canonical visual-search protocols primarily analyze RT/accuracy rather than point rewards.
-- Citation-supported rationale: dependent measures in the cited literature center on search efficiency (accuracy and RT trends).
+- Letter-and-color instantiation (`T`/`L`, red/green) is an implementation inference consistent with feature/conjunction definitions in cited papers.
+- Exact block/trial counts are implementation choices for operational practicality; QA/sim profiles intentionally reduce counts for gate speed.
+- Circular array geometry and jitter values are inferred layout parameters chosen to preserve readable spacing while maintaining eccentricity-based search demands.
+- No monetary reward/penalty feedback is implemented because this paradigm focuses on RT/accuracy search efficiency rather than value updates.
