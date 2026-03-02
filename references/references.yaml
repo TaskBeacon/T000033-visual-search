@@ -1,120 +1,65 @@
-task_id: T000033
-generated_at: '2026-02-18T17:05:27Z'
-selection_policy: openalex_filter_plus_manual_curation
+﻿task_id: T000033
+generated_at: '2026-02-19T11:20:00Z'
+selection_policy: manual_curated_visual_search_core
 citation_threshold: 100
 papers:
-- id: W2054802006
-  title: A saliency-based search mechanism for overt and covert shifts of visual attention
-  authors:
-  - L. Itti
-  - Christof Koch
-  year: 2000
-  journal: Vision Research
-  doi_or_url: https://doi.org/10.1016/s0042-6989(99)00163-7
-  citation_count: 3152
-  is_high_impact: false
-  open_access: true
-  used_for:
-  - task_workflow
-  - timing_parameters
-  parameter_bindings: {}
-  notes: ''
-- id: W2093353037
-  title: Guided Search 2.0 A revised model of visual search
-  authors:
-  - Jeremy M. Wolfe
-  year: 1994
-  journal: Psychonomic Bulletin & Review
-  doi_or_url: https://doi.org/10.3758/bf03200774
-  citation_count: 3520
-  is_high_impact: false
-  open_access: true
-  used_for:
-  - task_workflow
-  - timing_parameters
-  parameter_bindings: {}
-  notes: ''
-- id: W2028046413
-  title: 'Avogadro: an advanced semantic chemical editor, visualization, and analysis
-    platform'
-  authors:
-  - Marcus D. Hanwell
-  - Donald Curtis
-  - David Lonie
-  - Tim Vandermeersch
-  - Eva Zurek
-  - Geoffrey Hutchison
-  year: 2012
-  journal: Journal of Cheminformatics
-  doi_or_url: https://doi.org/10.1186/1758-2946-4-17
-  citation_count: 9879
-  is_high_impact: false
-  open_access: true
-  used_for:
-  - task_workflow
-  - timing_parameters
-  parameter_bindings: {}
-  notes: ''
-- id: W2277195237
-  title: 'Visual Genome: Connecting Language and Vision Using Crowdsourced Dense Image
-    Annotations'
-  authors:
-  - Ranjay Krishna
-  - Yuke Zhu
-  - Oliver Groth
-  - Justin Johnson
-  - Kenji Hata
-  - Joshua Kravitz
-  - Stephanie Chen
-  - Yannis Kalantidis
-  - Li-Jia Li
-  - David A. Shamma
-  - Michael S. Bernstein
-  - Li Fei-Fei
-  year: 2017
-  journal: International Journal of Computer Vision
-  doi_or_url: https://doi.org/10.1007/s11263-016-0981-7
-  citation_count: 5029
-  is_high_impact: false
-  open_access: true
-  used_for:
-  - task_workflow
-  - timing_parameters
-  parameter_bindings: {}
-  notes: ''
-- id: W2155142785
-  title: 'Cytoscape 2.8: new features for data integration and network visualization'
-  authors:
-  - Michael Smoot
-  - Keiichiro Ono
-  - Johannes Ruscheinski
-  - Pengliang Wang
-  - Trey Ideker
-  year: 2010
-  journal: Bioinformatics
-  doi_or_url: https://doi.org/10.1093/bioinformatics/btq675
-  citation_count: 4947
-  is_high_impact: false
-  open_access: true
-  used_for:
-  - task_workflow
-  - timing_parameters
-  parameter_bindings: {}
-  notes: ''
-- id: W2065769502
-  title: Error and attack tolerance of complex networks
-  authors:
-  - Réka Albert
-  - Hawoong Jeong
-  - Albert-László Barabási
-  year: 2000
-  journal: Nature
-  doi_or_url: https://doi.org/10.1038/35019019
-  citation_count: 7030
-  is_high_impact: true
-  open_access: true
-  used_for:
-  - task_workflow
-  - timing_parameters
-  parameter_bindings: {}
-  notes: ''
+  - id: TreismanGelade1980
+    title: A feature-integration theory of attention
+    authors:
+      - Anne Treisman
+      - Garry Gelade
+    year: 1980
+    journal: Cognitive Psychology
+    doi_or_url: https://doi.org/10.1016/0010-0285(80)90005-5
+    citation_count: 10000
+    is_high_impact: true
+    open_access: false
+    used_for:
+      - task_workflow
+      - condition_design
+      - stimulus_logic
+    parameter_bindings:
+      - task.conditions
+      - controller.feature_set_sizes
+      - controller.target_color
+      - controller.distractor_color
+    notes: Foundational feature vs conjunction search formulation.
+  - id: Wolfe1994
+    title: Guided Search 2.0 A revised model of visual search
+    authors:
+      - Jeremy M. Wolfe
+    year: 1994
+    journal: Psychonomic Bulletin & Review
+    doi_or_url: https://doi.org/10.3758/BF03200774
+    citation_count: 3500
+    is_high_impact: false
+    open_access: true
+    used_for:
+      - task_workflow
+      - conjunction_search_rationale
+      - timing_parameters
+    parameter_bindings:
+      - timing.response_deadline
+      - controller.conjunction_set_sizes
+    notes: Core model support for conjunction-driven search cost.
+  - id: DuncanHumphreys1989
+    title: Visual search and stimulus similarity
+    authors:
+      - John Duncan
+      - Glyn W. Humphreys
+    year: 1989
+    journal: Psychological Review
+    doi_or_url: https://doi.org/10.1037/0033-295X.96.3.433
+    citation_count: 2500
+    is_high_impact: true
+    open_access: false
+    used_for:
+      - dependent_measures
+      - response_policy
+      - layout_rationale
+    parameter_bindings:
+      - task.key_list
+      - timing.iti_duration
+      - triggers.map.response_present
+      - triggers.map.response_absent
+    notes: Supports similarity-based search behavior and response interpretation.

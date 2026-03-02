@@ -1,20 +1,18 @@
-subinfo_fields:
-- name: subject_id
-  type: int
-  constraints:
-    min: 101
-    max: 999
-    digits: 3
+﻿subinfo_fields:
+  - name: subject_id
+    type: int
+    constraints:
+      min: 101
+      max: 999
+      digits: 3
 subinfo_mapping:
-  subject_id: 被试编号（3位）
-  Participant Information: 被试信息
-  registration_failed: 注册失败
-  registration_successful: 注册成功
-  invalid_input: '{field} 输入无效'
+  subject_id: Subject ID (3 digits)
+  Participant Information: Participant Information
+  registration_failed: Registration failed
+  registration_successful: Registration successful
+  invalid_input: "{field} is invalid"
 window:
-  size:
-  - 1280
-  - 720
+  size: [1280, 720]
   units: pix
   screen: 0
   bg_color: gray
@@ -25,183 +23,81 @@ task:
   task_name: visual_search
   save_path: ./outputs/sim
   total_blocks: 1
-  total_trials: 9
-  trial_per_block: 9
+  total_trials: 16
+  trial_per_block: 16
   conditions:
-  - feature
-  - conjunction
-  - absent
+    - feature_present
+    - feature_absent
+    - conjunction_present
+    - conjunction_absent
   key_list:
-  - f
-  - j
-  - space
+    - f
+    - j
+    - space
+  present_key: f
+  absent_key: j
   seed_mode: same_across_sub
-  delta: 1
-  language: Chinese
-  voice_name: zh-CN-YunyangNeural
+  language: English
+  voice_name: en-US-AriaNeural
   voice_enabled: false
 timing:
-  cue_duration: 0.5
-  anticipation_duration: 1.0
-  prefeedback_duration: 0.4
-  feedback_duration: 0.8
+  fixation_duration: [0.3, 0.4]
+  response_deadline: 1.2
+  iti_duration: 0.2
+  item_height: 42
+  item_font: Arial
 stimuli:
-  fixation:
-    type: text
-    text: +
-    color: white
-    height: 48
-    font: SimHei
   instruction_text:
     type: text
-    text: '视觉搜索任务
-
-
-      请判断目标是否出现在当前阵列中。
-
-      F=目标存在，J=目标不存在。
-
-
-      按空格键开始。'
+    text: "Visual Search SIM\n\nFind the red T.\nF = present, J = absent.\n\nPress SPACE to begin."
     color: white
     height: 28
     wrapWidth: 980
-    font: SimHei
-  feature_cue:
+    pos: [0, 40]
+  fixation:
     type: text
-    text: 线索：特征搜索
+    text: "+"
     color: white
     height: 44
-    wrapWidth: 900
-    font: SimHei
-  conjunction_cue:
+    pos: [0, 0]
+  search_goal:
     type: text
-    text: 线索：结合搜索
-    color: white
-    height: 44
-    wrapWidth: 900
-    font: SimHei
-  absent_cue:
-    type: text
-    text: 线索：目标缺失
-    color: yellow
-    height: 44
-    wrapWidth: 900
-    font: SimHei
-  feature_target:
-    type: text
-    text: '目标是否出现？
-
-      F=出现   J=未出现'
-    color: white
-    height: 54
-    wrapWidth: 900
-    font: SimHei
-  conjunction_target:
-    type: text
-    text: '目标是否出现？
-
-      F=出现   J=未出现'
-    color: white
-    height: 54
-    wrapWidth: 900
-    font: SimHei
-  absent_target:
-    type: text
-    text: '目标是否出现？
-
-      F=出现   J=未出现'
-    color: white
-    height: 54
-    wrapWidth: 900
-    font: SimHei
-  feature_hit_feedback:
-    type: text
-    text: 反应已记录
-    color: green
-    height: 42
-    font: SimHei
-  feature_miss_feedback:
-    type: text
-    text: 未在时限内作答
-    color: red
-    height: 42
-    font: SimHei
-  conjunction_hit_feedback:
-    type: text
-    text: 反应已记录
-    color: green
-    height: 42
-    font: SimHei
-  conjunction_miss_feedback:
-    type: text
-    text: 未在时限内作答
-    color: red
-    height: 42
-    font: SimHei
-  absent_hit_feedback:
-    type: text
-    text: 反应已记录
-    color: green
-    height: 42
-    font: SimHei
-  absent_miss_feedback:
-    type: text
-    text: 未在时限内作答
-    color: red
-    height: 42
-    font: SimHei
-  block_break:
-    type: text
-    text: '区块 {block_num}/{total_blocks}
-
-      记录率：{accuracy:.2%}
-
-      当前分数：{total_score}
-
-
-      按空格键继续'
-    color: white
-    height: 24
-    wrapWidth: 900
-    font: SimHei
-  good_bye:
-    type: text
-    text: '任务结束，最终分数：{total_score}
-
-
-      按空格键退出'
-    color: white
+    text: "Find red T"
+    color: [0.92, 0.92, 0.92]
     height: 28
     wrapWidth: 900
-    font: SimHei
+    pos: [0, 305]
+  array_boundary:
+    type: circle
+    radius: 285
+    pos: [0, 0]
+    lineColor: [0.45, 0.45, 0.45]
+    lineWidth: 2
+    fillColor: null
+  block_break:
+    type: text
+    text: "Block {block_num}/{total_blocks} complete\n\nAccuracy: {block_accuracy:.1%}\nMean correct RT: {mean_rt_ms:.0f} ms\nTimeouts: {timeout_count}\n\nPress SPACE when ready."
+    color: white
+    height: 26
+    wrapWidth: 980
+  good_bye:
+    type: text
+    text: "SIM complete.\n\nTrials: {total_trials}\nAccuracy: {total_accuracy:.1%}\nMean correct RT: {mean_rt_ms:.0f} ms\nTimeouts: {total_timeouts}\n\nPress SPACE to exit."
+    color: white
+    height: 28
+    wrapWidth: 980
 triggers:
   map:
     exp_onset: 1
     exp_end: 2
     block_onset: 10
     block_end: 11
-    feature_cue_onset: 20
-    conjunction_cue_onset: 21
-    absent_cue_onset: 22
-    feature_anti_onset: 30
-    conjunction_anti_onset: 31
-    absent_anti_onset: 32
-    feature_target_onset: 40
-    conjunction_target_onset: 41
-    absent_target_onset: 42
-    feature_key_press: 50
-    conjunction_key_press: 51
-    absent_key_press: 52
-    feature_no_response: 60
-    conjunction_no_response: 61
-    absent_no_response: 62
-    feature_hit_fb_onset: 70
-    feature_miss_fb_onset: 71
-    conjunction_hit_fb_onset: 72
-    conjunction_miss_fb_onset: 73
-    absent_hit_fb_onset: 74
-    absent_miss_fb_onset: 75
+    fixation_onset: 20
+    search_onset: 30
+    response_present: 31
+    response_absent: 32
+    search_timeout: 33
+    iti_onset: 40
   driver:
     type: serial_url
     url: loop://
@@ -211,12 +107,16 @@ triggers:
   policy:
     strict: false
 controller:
-  initial_duration: 0.25
-  min_duration: 0.08
-  max_duration: 0.4
-  step: 0.02
-  target_accuracy: 0.66
-  condition_specific: true
+  feature_set_sizes: [8, 12]
+  conjunction_set_sizes: [8, 12]
+  array_radius_px: 240
+  array_radius_jitter_px: 20
+  orientation_pool: [0, 90, 180, 270]
+  target_glyph: T
+  conjunction_alt_glyph: L
+  target_color: red
+  distractor_color: green
+  random_seed: 17
   enable_logging: true
 sim:
   output_dir: outputs/sim
@@ -232,3 +132,5 @@ sim:
     kwargs:
       key: f
       rt_s: 0.25
+
+

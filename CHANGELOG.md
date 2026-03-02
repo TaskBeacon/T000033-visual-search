@@ -1,15 +1,14 @@
-# CHANGELOG
+﻿# CHANGELOG
 
 ## [v0.1.1-dev] - 2026-02-19
 
 ### Changed
-- Rebuilt literature bundle with task-relevant curated papers and regenerated reference artifacts.
-- Replaced corrupted `references/task_logic_audit.md` with a full state-machine audit.
-- Updated `references/stimulus_mapping.md` to concrete implemented stimulus IDs per condition.
-- Synced metadata (`README.md`, `taskbeacon.yaml`) with current configuration and evidence.
-
-
-All notable development changes for `T000033-visual-search` are documented here.
+- Replaced MID-style cue/anticipation/target/feedback flow with a zero-base visual-search implementation: fixation -> search array -> ITI.
+- Rebuilt `src/utils.py` as a visual-search controller that generates feature/conjunction arrays, target-present/absent conditions, and circular item layouts.
+- Rewrote `src/run_trial.py` to draw real search stimuli (`T`/`L` letter arrays) and capture present/absent responses with timeout handling.
+- Updated all configs to explicit visual-search conditions (`feature_present`, `feature_absent`, `conjunction_present`, `conjunction_absent`) and coherent trigger maps.
+- Replaced poisoned reference artifacts with literature-first mappings (`task_logic_audit.md`, `stimulus_mapping.md`, `parameter_mapping.md`, `references.yaml`).
+- Updated `README.md` and simulation responder logic to match the repaired paradigm.
 
 ## [0.1.0] - 2026-02-17
 
