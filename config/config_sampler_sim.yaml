@@ -106,7 +106,7 @@ triggers:
     post_delay_ms: 1
   policy:
     strict: false
-controller:
+condition_generation:
   feature_set_sizes: [8, 12]
   conjunction_set_sizes: [8, 12]
   array_radius_px: 240

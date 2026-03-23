@@ -1,0 +1,189 @@
+task_plot_spec:
+  spec_version: '0.2'
+  meta:
+    task_name: Visual Search Task
+    mode: existing
+    task_id: ''
+  figure:
+    output:
+      filename: task_flow.png
+      dpi: 300
+      width_in: 16.0
+      background: white
+    layout:
+      max_conditions: 2
+      screens_per_timeline: 4
+      screen_overlap_ratio: 0.1
+      screen_slope: 0.08
+      screen_slope_deg: 25.0
+      timeline_gap: 0.18
+      screen_aspect_ratio: 1.4545454545454546
+      left_margin: 0.2
+      right_margin: 0.03
+      top_margin: 0.03
+      bottom_margin: 0.05
+      condition_label_gap: 0.014
+      phase_label_pad: 0.01
+      duration_label_gap: 0.006
+      timeline_arrow_gap: 0.01
+      timeline_arrow_screen_clearance: 0.007
+      timeline_arrow_text_clearance: 0.01
+      timeline_arrow_extra_per_screen: 0.015
+      timeline_arrow_min_y: 0.02
+      timeline_arrow_max_y: 0.96
+  timelines:
+  - condition: feature_present
+    display_condition_label: Feature Present
+    phases:
+    - phase_name: fixation
+      display_phase_label: Fixation
+      duration_ms: null
+      response_window_ms: null
+      display_timing_label: ''
+      stim_ids:
+      - fixation
+      - search_goal
+      stimulus_example:
+        summary: + + Find red T
+        modality: visual
+        draw_hint: text
+        render_items:
+        - kind: text
+          text: +
+          color: white
+          pos:
+          - 0.0
+          - 0.0
+          height: 44.0
+        - kind: text
+          text: Find red T
+          color: '#f4f4f4'
+          pos:
+          - 0.0
+          - 305.0
+          height: 28.0
+      notes: ''
+    - phase_name: search array
+      display_phase_label: Search Array
+      duration_ms: null
+      response_window_ms:
+        fixed: 2000
+      display_timing_label: Resp 2000 ms
+      stim_ids:
+      - array_boundary
+      - fixation
+      - search_goal
+      - search_items
+      stimulus_example:
+        summary: Circular search array with letters distributed along ring
+        modality: mixed
+        draw_hint: shape
+        render_items:
+        - kind: shape
+          shape: ring
+          pos:
+          - 0.0
+          - 0.0
+          size:
+          - 2.2
+          - 2.2
+          line_color: '#8f9bb3'
+          line_width: 1.6
+        - kind: text
+          text: +
+          color: white
+          pos:
+          - 0.0
+          - 0.0
+          height: 44.0
+        - kind: text
+          text: Find red T
+          color: '#f4f4f4'
+          pos:
+          - 0.0
+          - 0.78
+          height: 28.0
+        - kind: text
+          text: T
+          color: '#ff5555'
+          pos:
+          - 0.0
+          - 0.36
+          height: 34.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - 0.34
+          - 0.24
+          height: 32.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - 0.38
+          - -0.06
+          height: 32.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - 0.26
+          - -0.30
+          height: 32.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - 0.0
+          - -0.38
+          height: 32.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - -0.30
+          - -0.30
+          height: 32.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - -0.38
+          - 0.04
+          height: 32.0
+        - kind: text
+          text: L
+          color: '#34d399'
+          pos:
+          - -0.28
+          - 0.30
+          height: 32.0
+      notes: ''
+    - phase_name: iti
+      display_phase_label: ITI
+      duration_ms: null
+      response_window_ms: null
+      display_timing_label: ''
+      stim_ids:
+      - fixation
+      stimulus_example:
+        summary: +
+        modality: visual
+        draw_hint: text
+        render_items:
+        - kind: text
+          text: +
+          color: white
+          pos:
+          - 0.0
+          - 0.0
+          height: 44.0
+      notes: ''
+    condition_variants:
+    - feature_absent
+    - conjunction_present
+    - conjunction_absent
+    display_condition_note: 'Also: Feature Absent, Conjunction Present, Conjunction
+      Absent'
+  legend: []

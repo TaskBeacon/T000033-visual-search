@@ -17,10 +17,11 @@ from psyflow import (
     initialize_triggers,
     load_config,
     parse_task_run_options,
+    reset_trial_counter,
     runtime_context,
 )
 
-from src import Controller, run_trial
+from src import run_trial
 
 
 def _make_qa_trigger_runtime():
@@ -77,7 +78,7 @@ def _summarize_trials(trials: list[dict]) -> tuple[float, float, int]:
 
 def run(options: TaskRunOptions):
     task_root = Path(__file__).resolve().parent
-    cfg = load_config(str(options.config_path))
+    cfg = load_config(str(options.config_path), extra_keys=["condition_generation"])
     mode = options.mode
 
     ctx = None
@@ -126,9 +127,9 @@ def _run_impl(*, mode: str, output_dir: Path | None, cfg: dict, participant_id: 
         stim_bank = stim_bank.convert_to_voice("instruction_text")
     stim_bank = stim_bank.preload_all()
 
-    settings.controller = cfg["controller_config"]
     settings.save_to_json()
-    controller = Controller.from_dict(settings.controller)
+    generation_cfg = dict(cfg.get("condition_generation_config", {}) or {})
+    reset_trial_counter(0)
 
     trigger_runtime.send(settings.triggers.get("exp_onset"))
 
@@ -141,10 +142,22 @@ def _run_impl(*, mode: str, output_dir: Path | None, cfg: dict, participant_id: 
 
     all_data = []
     total_blocks = int(getattr(settings, "total_blocks", 1))
+    trials_per_block = int(
+        getattr(settings, "trial_per_block", 0) or getattr(settings, "trials_per_block", 0) or 0
+    )
+    if trials_per_block <= 0:
+        trials_per_block = max(1, int(getattr(settings, "total_trials", total_blocks) or total_blocks) // max(1, total_blocks))
+
     for block_i in range(total_blocks):
-        controller.start_block(block_i)
         if mode not in ("qa", "sim"):
             count_down(win, 3, color="black")
+
+        block_seed = block_i + 1
+        if isinstance(getattr(settings, "block_seed", None), (list, tuple)) and len(settings.block_seed) > block_i:
+            try:
+                block_seed = int(settings.block_seed[block_i])
+            except Exception:
+                block_seed = block_i + 1
 
         block = (
             BlockUnit(
@@ -154,17 +167,23 @@ def _run_impl(*, mode: str, output_dir: Path | None, cfg: dict, participant_id: 
                 window=win,
                 keyboard=kb,
             )
-                .generate_conditions()
+                .generate_conditions(
+                    n_trials=trials_per_block,
+                    condition_labels=list(getattr(settings, "conditions", [])),
+                    weights=settings.resolve_condition_weights(),
+                    seed=block_seed,
+                )
                 .on_start(lambda b: trigger_runtime.send(settings.triggers.get("block_onset")))
                 .on_end(lambda b: trigger_runtime.send(settings.triggers.get("block_end")))
                 .run_trial(
                     partial(
                         run_trial,
                         stim_bank=stim_bank,
-                        controller=controller,
                         trigger_runtime=trigger_runtime,
                         block_id=f"block_{block_i}",
                         block_idx=block_i,
+                        block_seed=block_seed,
+                        condition_generation_config=generation_cfg,
                     )
                 )
                 .to_dict(all_data)

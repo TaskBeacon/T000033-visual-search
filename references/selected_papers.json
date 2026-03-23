@@ -10,7 +10,7 @@
     "is_high_impact": true,
     "open_access": false,
     "used_for": ["task_workflow", "condition_design", "stimulus_logic"],
-    "parameter_bindings": ["task.conditions", "controller.feature_set_sizes"],
+    "parameter_bindings": ["task.conditions", "condition_generation.feature_set_sizes"],
     "notes": "Foundational feature-integration account."
   },
   {
@@ -24,7 +24,7 @@
     "is_high_impact": false,
     "open_access": true,
     "used_for": ["task_workflow", "conjunction_search_rationale", "timing_parameters"],
-    "parameter_bindings": ["timing.response_deadline", "controller.conjunction_set_sizes"],
+    "parameter_bindings": ["timing.response_deadline", "condition_generation.conjunction_set_sizes"],
     "notes": "Guided-search interpretation for conjunction costs."
   },
   {

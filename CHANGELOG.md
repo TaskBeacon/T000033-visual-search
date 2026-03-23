@@ -1,4 +1,25 @@
-﻿# CHANGELOG
+# CHANGELOG
+
+## [v0.1.5-dev] - 2026-03-18
+
+### Changed
+- Switched block condition scheduling back to native `BlockUnit.generate_conditions(...)` (label-level), with optional `task.condition_weights` resolved through `TaskSettings.resolve_condition_weights()`.
+- Refactored `src/run_trial.py` to realize search-item layout and timing directly from condition labels plus seed context (no custom block-level condition payload generator).
+- Updated `src/utils.py` to provide lightweight runtime helpers (`build_visual_search_trial_spec`) instead of custom condition-sequence APIs.
+- Synced skill/docs text to the default policy: built-in condition generator first, custom generators only for cross-trial/global constraints.
+- Removed task-local duration sampling for fixation/ITI; duration ranges are now passed directly to `StimUnit.show(...)` and sampled by PsyFlow runtime.
+- Added `task_flow.png` embed under README `## 2. Task Flow` for direct visual preview.
+
+### Fixed
+- Removed the incompatible custom generator call signature path that expected keyword-only arguments and could fail under `BlockUnit.generate_conditions(func=...)` positional callback invocation.
+
+## [v0.1.4-dev] - 2026-03-18
+
+### Changed
+- Removed the `Controller` class and replaced it with pure generation helpers in `src/utils.py` (`generate_visual_search_conditions`).
+- Refactored `src/run_trial.py` to consume pre-generated condition payloads and use PsyFlow `next_trial_id()` / `resolve_deadline()`.
+- Simplified `main.py` to pre-generate trial conditions via `BlockUnit.generate_conditions(func=generate_visual_search_conditions, ...)` and removed runtime sampler/counter plumbing.
+- Updated `README.md` and `references/task_logic_audit.md` to match the no-controller-class architecture and current trial-flow semantics.
 
 ## [v0.1.3-dev] - 2026-03-02
 

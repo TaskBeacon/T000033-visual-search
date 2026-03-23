@@ -1,41 +1,11 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Any
 
 from psychopy.visual import TextStim
 
-from psyflow import StimUnit, set_trial_context
-
-
-def _deadline_s(value: Any) -> float | None:
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, (list, tuple)) and value:
-        try:
-            return float(max(value))
-        except Exception:
-            return None
-    return None
-
-
-def _sample_duration(controller, value: Any, default_value: float) -> float:
-    if hasattr(controller, "sample_duration"):
-        return float(controller.sample_duration(value, default_value))
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, (list, tuple)) and value:
-        try:
-            return float(max(value))
-        except Exception:
-            return float(default_value)
-    return float(default_value)
-
-
-def _trial_id(controller) -> int:
-    if hasattr(controller, "next_trial_id"):
-        return int(controller.next_trial_id())
-    return 1
+from psyflow import StimUnit, next_trial_id, resolve_deadline, set_trial_context
+from .utils import build_visual_search_trial_spec
 
 
 def run_trial(
@@ -44,38 +14,56 @@ def run_trial(
     settings,
     condition,
     stim_bank,
-    controller,
     trigger_runtime,
     block_id=None,
     block_idx=None,
+    block_seed=None,
+    condition_generation_config=None,
 ):
     """Run one feature/conjunction visual-search trial."""
-    trial_id = _trial_id(controller)
-    trial_spec = controller.build_trial(condition)
+    trial_id = int(next_trial_id())
+    condition_label = (
+        str(condition).strip().lower()
+        if not isinstance(condition, dict)
+        else str(condition.get("condition", "feature_present")).strip().lower()
+    )
+    spec = build_visual_search_trial_spec(
+        condition=condition_label,
+        trial_id=trial_id,
+        block_seed=block_seed,
+        generation_config=condition_generation_config,
+    )
+    condition_label = str(spec.get("condition", condition_label)).strip().lower()
+    search_type = str(spec.get("search_type", "feature")).strip().lower()
+    target_present = bool(spec.get("target_present", True))
+    set_size = int(spec.get("set_size", 0))
+    target_index = spec.get("target_index", None)
+    condition_id = str(spec.get("condition_id", f"{condition_label}_trial_{trial_id:03d}"))
+    items_payload = list(spec.get("items", [])) if isinstance(spec.get("items", []), list) else []
+    fixation_duration = getattr(settings, "fixation_duration", 0.6)
+    iti_duration = getattr(settings, "iti_duration", 0.4)
 
     block_label = str(block_id) if block_id is not None else "block_0"
     block_index = int(block_idx) if block_idx is not None else 0
-    trial_index = int(getattr(controller, "trial_count_block", 0)) + 1
 
     present_key = str(getattr(settings, "present_key", "f")).strip().lower()
     absent_key = str(getattr(settings, "absent_key", "j")).strip().lower()
     response_keys = [present_key, absent_key]
-    correct_key = present_key if bool(trial_spec.target_present) else absent_key
+    correct_key = present_key if target_present else absent_key
 
-    fixation_duration = _sample_duration(controller, settings.fixation_duration, 0.6)
-    response_deadline = float(getattr(settings, "response_deadline", 2.0))
-    iti_duration = _sample_duration(controller, settings.iti_duration, 0.4)
+    response_deadline = getattr(settings, "response_deadline", 2.0)
 
     trial_data = {
-        "condition": str(trial_spec.condition),
+        "condition": condition_label,
         "trial_id": trial_id,
-        "trial_index": trial_index,
+        "trial_index": trial_id,
         "block_id": block_label,
         "block_idx": block_index,
-        "search_type": str(trial_spec.search_type),
-        "target_present": bool(trial_spec.target_present),
-        "set_size": int(trial_spec.set_size),
-        "target_index": trial_spec.target_index,
+        "search_type": search_type,
+        "target_present": target_present,
+        "set_size": set_size,
+        "target_index": target_index,
+        "condition_id": condition_id,
         "correct_key": correct_key,
     }
 
@@ -88,15 +76,15 @@ def run_trial(
         fixation,
         trial_id=trial_id,
         phase="fixation",
-        deadline_s=_deadline_s(fixation_duration),
+        deadline_s=resolve_deadline(fixation_duration),
         valid_keys=[],
         block_id=block_label,
-        condition_id=str(trial_spec.condition),
+        condition_id=condition_id,
         task_factors={
-            "condition": str(trial_spec.condition),
-            "search_type": str(trial_spec.search_type),
-            "target_present": bool(trial_spec.target_present),
-            "set_size": int(trial_spec.set_size),
+            "condition": condition_label,
+            "search_type": search_type,
+            "target_present": target_present,
+            "set_size": set_size,
             "stage": "fixation",
             "block_idx": block_index,
         },
@@ -110,14 +98,19 @@ def run_trial(
     item_height = float(getattr(settings, "item_height", 44))
     item_font = str(getattr(settings, "item_font", "Arial"))
     search_items = []
-    for item in trial_spec.items:
+    for item in items_payload:
+        if not isinstance(item, dict):
+            continue
+        pos = item.get("pos", [0.0, 0.0])
+        if not isinstance(pos, (list, tuple)) or len(pos) < 2:
+            pos = [0.0, 0.0]
         search_items.append(
             TextStim(
                 win=win,
-                text=str(item.glyph),
-                pos=(float(item.pos[0]), float(item.pos[1])),
-                color=item.color,
-                ori=float(item.ori),
+                text=str(item.get("glyph", "T")),
+                pos=(float(pos[0]), float(pos[1])),
+                color=str(item.get("color", "white")),
+                ori=float(item.get("ori", 0.0)),
                 height=item_height,
                 font=item_font,
             )
@@ -132,15 +125,15 @@ def run_trial(
         search_array,
         trial_id=trial_id,
         phase="search_array",
-        deadline_s=_deadline_s(response_deadline),
+        deadline_s=resolve_deadline(response_deadline),
         valid_keys=response_keys,
         block_id=block_label,
-        condition_id=str(trial_spec.condition),
+        condition_id=condition_id,
         task_factors={
-            "condition": str(trial_spec.condition),
-            "search_type": str(trial_spec.search_type),
-            "target_present": bool(trial_spec.target_present),
-            "set_size": int(trial_spec.set_size),
+            "condition": condition_label,
+            "search_type": search_type,
+            "target_present": target_present,
+            "set_size": set_size,
             "present_key": present_key,
             "absent_key": absent_key,
             "block_idx": block_index,
@@ -171,15 +164,15 @@ def run_trial(
         iti,
         trial_id=trial_id,
         phase="iti",
-        deadline_s=_deadline_s(iti_duration),
+        deadline_s=resolve_deadline(iti_duration),
         valid_keys=[],
         block_id=block_label,
-        condition_id=str(trial_spec.condition),
+        condition_id=condition_id,
         task_factors={
-            "condition": str(trial_spec.condition),
-            "search_type": str(trial_spec.search_type),
-            "target_present": bool(trial_spec.target_present),
-            "set_size": int(trial_spec.set_size),
+            "condition": condition_label,
+            "search_type": search_type,
+            "target_present": target_present,
+            "set_size": set_size,
             "stage": "iti",
             "block_idx": block_index,
         },
@@ -198,12 +191,5 @@ def run_trial(
             "timed_out": not responded,
             "responded": responded,
         }
-    )
-
-    controller.record_trial(
-        hit=hit,
-        rt_s=rt_s,
-        responded=responded,
-        condition=str(trial_spec.condition),
     )
     return trial_data

@@ -24,8 +24,8 @@
 
 - Human profile: `3` blocks x `48` trials.
 - QA/sim profiles: `1` block x `16` trials.
-- `BlockUnit.generate_conditions()` samples configured condition tokens per block.
-- Controller resets block counters via `controller.start_block(block_idx)`.
+- `BlockUnit.generate_conditions(...)` schedules label-level conditions from `task.conditions` (default PsyFlow path).
+- `run_trial.py` realizes trial-level item layouts from each condition label and resolves global `trial_id` via PsyFlow `next_trial_id()`.
 
 ### Trial State Machine
 
@@ -36,7 +36,7 @@
 - Next: `search_array`.
 
 2. `search_array`
-- Stimuli: `array_boundary`, `fixation`, `search_goal`, plus dynamic item list from controller (`search_items`).
+- Stimuli: `array_boundary`, `fixation`, `search_goal`, plus dynamic item list from trial sampler helpers (`search_items`).
 - Trigger: `search_onset`.
 - Valid keys: `present_key`, `absent_key`.
 - Response triggers: `response_present`, `response_absent`.
@@ -95,7 +95,7 @@
   - sampled positions around circular ring (`array_radius_px` with jitter)
   - item height configured by `timing.item_height`
   - item font configured by `timing.item_font`
-  - orientation sampled from `controller.orientation_pool`.
+  - orientation sampled from `condition_generation.orientation_pool` inside runtime helpers.
 - Readability rationale:
   - set sizes are capped and positions are jittered from angular scaffolding to avoid dense overlap.
 
@@ -120,7 +120,8 @@
 - `src/run_trial.py` uses visual-search-native phases only (`fixation -> search_array -> iti`); MID template phases are removed.
 - `set_trial_context(...)` on `search_array` includes sampler-critical factors: `target_present`, `present_key`, `absent_key`, `set_size`.
 - Participant-facing wording is config-driven (`stimuli.*`) to support localization without code edits.
-- Controller owns search-array generation; runtime orchestrates phase execution and logging.
+- Search-array generation is implemented as pure helper functions in `src/utils.py`; `run_trial.py` performs condition-to-stimulus realization on demand (no custom block-level condition generator).
+- Duration ranges are passed directly to `StimUnit.show(...)` / `StimUnit.capture_response(...)`; no task-local `_sample_duration` layer is used.
 
 ## 8. Inference Log
 

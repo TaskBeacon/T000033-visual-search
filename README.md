@@ -5,11 +5,11 @@
 | Field | Value |
 |---|---|
 | Name | Visual Search Task |
-| Version | v0.1.1-dev |
+| Version | v0.1.5-dev |
 | URL / Repository | https://github.com/TaskBeacon/T000033-visual-search |
 | Short Description | Feature vs conjunction visual search with present/absent decisions. |
 | Created By | TaskBeacon |
-| Date Updated | 2026-02-19 |
+| Date Updated | 2026-03-18 |
 | PsyFlow Version | 0.1.9 |
 | PsychoPy Version | 2025.1.1 |
 | Modality | Behavior |
@@ -24,11 +24,13 @@ The implementation explicitly separates feature-search and conjunction-search di
 
 ## 2. Task Flow
 
+![Task Flow](task_flow.png)
+
 ### Block-Level Flow
 
 | Step | Description |
 |---|---|
-| 1. Block setup | `BlockUnit` generates balanced conditions from `task.conditions`. |
+| 1. Block setup | `BlockUnit.generate_conditions(...)` creates label-level condition sequence from `task.conditions`. |
 | 2. Trial execution | `run_trial(...)` runs fixation -> search array -> ITI per trial. |
 | 3. Block summary | Accuracy, mean correct RT, and timeout count are shown between blocks. |
 | 4. Final summary | Session-level accuracy/RT/timeout metrics are displayed. |
@@ -46,8 +48,8 @@ The implementation explicitly separates feature-search and conjunction-search di
 | Component | Description |
 |---|---|
 | Condition parser | Maps condition tokens to `(search_type, target_present)` factors. |
-| Trial generator | Samples set size, circular positions, and distractor composition by condition. |
-| Metrics tracker | Tracks total/block correct counts, timeout counts, and correct RT means. |
+| Runtime realization | `run_trial(...)` resolves set size/positions/distractor composition from condition label plus seed context; duration ranges are passed to `StimUnit.show()/capture_response()` for framework-level sampling. |
+| Trial ID resolver | Uses PsyFlow `next_trial_id()` at runtime for global trial IDs (no task-local `Controller` class). |
 
 ### Other Logic
 
@@ -81,7 +83,7 @@ The implementation explicitly separates feature-search and conjunction-search di
 | Name | Type | Description |
 |---|---|---|
 | `fixation` | text | Central fixation cross used in fixation/ITI/search display. |
-| `search_goal` | text | Constant top reminder: `Target: red T`. |
+| `search_goal` | text | Constant top reminder: `Find red T`. |
 | `array_boundary` | circle | Visual boundary for ring-based search layout. |
 | dynamic search items | text | Trial-generated letters (`T`/`L`) with color/orientation/position factors. |
 | `instruction_text`, `block_break`, `good_bye` | text | Instruction and summary screens. |
@@ -112,6 +114,7 @@ The implementation explicitly separates feature-search and conjunction-search di
 | `feature_set_sizes`, `conjunction_set_sizes` | Set-size pools for feature/conjunction trials. |
 | `array_radius_px`, `array_radius_jitter_px` | Circular layout geometry. |
 | `target_glyph`, `conjunction_alt_glyph`, color fields | Defines target and distractor identities. |
+| Notes | No separate controller class; these parameters are consumed directly inside `run_trial(...)`. |
 
 ## 4. Methods (for academic publication)
 
